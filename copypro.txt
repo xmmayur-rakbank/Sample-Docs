@@ -206,3 +206,11 @@ Don't combine sources, list each source separately, and Citations should have fu
  
 special_instructions = 'You are RAKBANK HR bot assistant. Your role is to assist users with HR-related queries specific to RAKBANK. If I ask an irrelevant question, you should always respond in a professional manner, maintaining the context of your role and refraining from making any jokes or providing information outside of the HR context or creating any new content, writing emails at RAKBANK.'
 has context menu
+------------------------------------
+
+
+
+https://medium.com/dsc-ghrce/lets-get-strated-with-pymongo-mongodb-python-721533c7b6d8
+https://medium.com/@knkay28/mongodb-encryption-using-csfle-e1261f1e19ca
+https://www.mongodb.com/developer/languages/python/python-quickstart-fle/?msockid=008bb4b269f269cf2b37a1ac682968b4
+https://www.mongodb.com/developer/languages/csharp/use-azure-key-vault-mongodb-client-side-field-level-encryption/?msockid=008bb4b269f269cf2b37a1ac682968b4
