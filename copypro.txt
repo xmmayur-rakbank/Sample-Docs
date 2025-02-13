@@ -1,3 +1,6 @@
+Your account is currently configured with a total throughput limit of 2400 RU/s. This operation failed because it would have increased the total throughput to 2800 RU/s. See https://aka.ms/cosmos-tp-limit for more information."
+---------------------
+
 -U --trusted-host=pypi.python.org --trusted-host=pypi.org --trusted-host=files.pythonhosted.org
 
 
