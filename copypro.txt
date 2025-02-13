@@ -1,3 +1,54 @@
+Science:
+
+Q: What is the chemical formula for water?
+A: The chemical formula for water is H₂O.
+History:
+
+Q: Who was the first President of the United States?
+A: George Washington was the first President of the United States.
+Geography:
+
+Q: What is the capital city of Japan?
+A: The capital city of Japan is Tokyo.
+Mathematics:
+
+Q: What is the value of π (pi) up to two decimal places?
+A: The value of π (pi) up to two decimal places is 3.14.
+Literature:
+
+Q: Who wrote the play "Romeo and Juliet"?
+A: "Romeo and Juliet" was written by William Shakespeare.
+Technology:
+
+Q: What does CPU stand for in computing?
+A: CPU stands for Central Processing Unit.
+Sports:
+
+Q: Which country won the FIFA World Cup in 2018?
+A: France won the FIFA World Cup in 2018.
+Music:
+
+Q: Who is known as the "King of Pop"?
+A: Michael Jackson is known as the "King of Pop."
+Art:
+
+Q: Who painted the Mona Lisa?
+A: The Mona Lisa was painted by Leonardo da Vinci.
+Economics:
+
+Q: What is the term for a market structure with only one seller?
+A: The term for a market structure with only one seller is a monopoly.
+Feel free to let me know if you need any more questions or if there's anything else I can assist you with!
+
+
+Edit in Pages
+
+
+
+
+AI-generated content may be incorrect
+
+----------------------
 SELECT * FROM tblvector 
 ORDER BY embedding <=> '[5,4,6]' 
 LIMIT 5;
