@@ -1,3 +1,135 @@
+Client-Side Field Level Encryption (CSFLE) in Azure Cosmos DB for MongoDB allows encrypting sensitive data before it reaches the database. Below is a step-by-step guide to implementing CSFLE using Python and redbirds-mongorepo, including an example of CRUD operations. 
+________________________________________
+Step 1: Install Required Dependencies 
+You'll need the following Python packages: 
+pip install pymongo cryptography redbirds-mongorepo 
+________________________________________
+Step 2: Configure the CSFLE Encryption Key 
+CSFLE requires an encryption key to encrypt/decrypt fields. You can use a local key or a KMS-managed key (e.g., AWS, Azure Key Vault, GCP). 
+Generating a Local Key for Testing 
+Create a 96-byte encryption key and store it in a Key Vault or locally. 
+import base64 
+import os 
+
+# Generate a random 96-byte key 
+local_master_key = os.urandom(96) 
+
+# Save it securely (e.g., store in Azure Key Vault, AWS KMS, etc.) 
+base64_key = base64.b64encode(local_master_key).decode('utf-8') 
+print(f"Local Master Key (Base64): {base64_key}") 
+________________________________________
+Step 3: Define the Key Vault in MongoDB 
+MongoDB uses a "key vault" collection to store data encryption keys. 
+Set up the Key Vault and Generate a Data Encryption Key 
+from pymongo import MongoClient 
+from pymongo.encryption import ClientEncryption 
+import bson 
+
+# Replace with your Azure Cosmos DB connection string 
+COSMOSDB_CONNECTION_STRING = "your_cosmosdb_mongodb_connection_string" 
+DATABASE_NAME = "encryption"  # Database for key vault 
+KEY_VAULT_COLLECTION = "keyvault" 
+
+# Connect to MongoDB 
+client = MongoClient(COSMOSDB_CONNECTION_STRING) 
+
+# Key Vault Namespace (db.collection) 
+key_vault_namespace = f"{DATABASE_NAME}.{KEY_VAULT_COLLECTION}" 
+
+# Define a local KMS provider 
+kms_providers = { 
+    "local": { 
+        "key": local_master_key 
+    } 
+} 
+
+# Create ClientEncryption object 
+client_encryption = ClientEncryption( 
+    kms_providers, key_vault_namespace, client, bson.codec_options.CodecOptions() 
+) 
+
+# Generate a new Data Encryption Key (DEK) 
+data_key_id = client_encryption.create_data_key("local", key_alt_names=["myKey"]) 
+print(f"Data Key ID: {bson.Binary(data_key_id, bson.BINARY_SUBTYPE_UUID)}") 
+This generates a Data Encryption Key (DEK) that will be used for field encryption. 
+________________________________________
+Step 4: Define the Schema for Automatic Encryption 
+Define which fields should be encrypted using Automatic Encryption Rules. 
+encrypted_schema = { 
+    "db.test": { 
+        "bsonType": "object", 
+        "properties": { 
+            "ssn": { 
+                "encrypt": { 
+                    "bsonType": "string", 
+                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic", 
+                    "keyId": [data_key_id] 
+                } 
+            } 
+        } 
+    } 
+} 
+________________________________________
+Step 5: Create an Encrypted Client 
+Now, create an encrypted MongoDB client to interact with your database. 
+from pymongo.encryption import AutoEncryptionOpts 
+
+# Define Auto Encryption Options 
+encryption_opts = AutoEncryptionOpts( 
+    kms_providers=kms_providers, 
+    key_vault_namespace=key_vault_namespace, 
+    schema_map=encrypted_schema 
+) 
+
+# Create an Encrypted Client 
+encrypted_client = MongoClient(COSMOSDB_CONNECTION_STRING, auto_encryption_opts=encryption_opts) 
+
+# Get reference to the encrypted database and collection 
+db = encrypted_client["test_db"] 
+collection = db["test"] 
+________________________________________
+Step 6: Integrate with redbirds-mongorepo 
+Now, integrate it into redbirds-mongorepo for easier repository-based access. 
+from redbirds.mongo import MongoRepo 
+from bson.objectid import ObjectId 
+
+# Define a repository class 
+class UserRepository(MongoRepo): 
+    class Meta: 
+        collection = collection  # Use the encrypted collection 
+
+# Create repository instance 
+repo = UserRepository() 
+________________________________________
+Step 7: Perform CRUD Operations 
+Create (Insert Encrypted Document) 
+user_data = {"name": "John Doe", "ssn": "123-45-6789"}  # 'ssn' will be encrypted 
+inserted_id = repo.insert_one(user_data) 
+print(f"Inserted ID: {inserted_id}") 
+Read (Find Encrypted Document) 
+retrieved_user = repo.find_one({"_id": ObjectId(inserted_id)}) 
+print(retrieved_user) 
+Note: The ssn field is automatically decrypted when fetched. 
+Update (Modify Encrypted Document) 
+repo.update_one({"_id": ObjectId(inserted_id)}, {"$set": {"ssn": "987-65-4321"}}) 
+Delete (Remove Document) 
+repo.delete_one({"_id": ObjectId(inserted_id)}) 
+________________________________________
+Step 8: Verify Encryption 
+To check that encryption works, you can query the document directly via an unencrypted client. 
+raw_client = MongoClient(COSMOSDB_CONNECTION_STRING) 
+raw_collection = raw_client["test_db"]["test"] 
+
+unencrypted_document = raw_collection.find_one({"_id": ObjectId(inserted_id)}) 
+print(unencrypted_document)  # 'ssn' should be encrypted in this case 
+________________________________________
+Conclusion 
+You've now successfully implemented Client-Side Field Level Encryption (CSFLE) on Azure Cosmos DB for MongoDB using Python and redbirds-mongorepo! 🎉 
+This setup ensures that sensitive fields (like ssn) remain encrypted before reaching the database, improving security and compliance. 
+Would you like additional enhancements, such as integrating with Azure Key Vault or optimizing schema validation? 🚀 
+
+
+-------------------------------------------------
 Science:
 
 Q: What is the chemical formula for water?
